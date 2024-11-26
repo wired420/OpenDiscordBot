@@ -2,7 +2,7 @@ Clone the Repository
 
 cd dbbot
 npm install
-cp config.json-DEFAULT config.json
+cp config.json-default config.json
 
 Edit config.json with your discord bot API key and for any other settings you
 want to change.
