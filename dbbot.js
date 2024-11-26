@@ -113,7 +113,7 @@ function logIt(message, isError = false)
   }
   else
   {
-    console.error(`[${config.appname}] ` + displayTime() + "ERROR> " + message);
+    console.error(`[${config.appname}] ` + displayTime() + "> ERROR: " + message);
   }
 }
 
