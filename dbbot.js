@@ -4,6 +4,10 @@
 // Load config file
 const config = require("./config.json");
 
+// Import Node Libs
+const fs = require('node:fs');
+const path = require('node:path');
+
 // Import HTTP libs
 const http = require('http');
 const request = require('request');
@@ -13,7 +17,7 @@ const cheerio = require('cheerio');
 const XMLHttpRequest = require('xhr2');
 
 // Require the necessary discord.js classes
-const { Client, Events, GatewayIntentBits } = require('discord.js');
+const { Client, Collection, Events, GatewayIntentBits } = require('discord.js');
 
 // Create a new client instance
 const client = new Client({ intents: [GatewayIntentBits.Guilds] });
@@ -23,6 +27,51 @@ client.once(Events.ClientReady, readyClient => {
 });
 
 client.login(config.token);
+
+// Command Handler
+client.commands = new Collection();
+
+const foldersPath = path.join(__dirname, 'commands');
+const commandFolders = fs.readdirSync(foldersPath);
+
+for (const folder of commandFolders) {
+    const commandsPath = path.join(foldersPath, folder);
+    const commandFiles = fs.readdirSync(commandsPath).filter(file => file.endsWith('.js'));
+    for (const file of commandFiles) {
+        const filePath = path.join(commandsPath, file);
+        const command = require(filePath);
+        if ('data' in command && 'execute' in command) {
+            client.commands.set(command.data.name, command);
+        } else {
+            logIt(`[WARNING] The command at ${filePath} is missing a required "data" or "execute" property.`, true);
+        }
+    }
+}
+
+// Command Callback
+client.on(Events.InteractionCreate, async interaction => {
+    if (!interaction.isChatInputCommand()) return;
+
+    const command = interaction.client.commands.get(interaction.commandName);
+
+    if (!command) {
+        logIt(`No command matching ${interaction.commandName} was found.`, true);
+        return;
+    }
+
+    try {
+        await command.execute(interaction);
+    }
+
+    catch (error) {
+        logIt(error, true);
+        if (interaction.replied || interaction.deferred) {
+            await interaction.followUp({ content: 'There was an error while executing this command!', ephemeral: true });
+        } else {
+            await interaction.reply({ content: 'There was an error while executing this command!', ephemeral: true });
+        }
+    }
+});
 
 // Generic Helpers
 function capStr(str)
@@ -64,7 +113,7 @@ function logIt(message, isError = false)
   }
   else
   {
-    console.error(`[${config.appname}] ` + displayTime() + "> " + message);
+    console.error(`[${config.appname}] ` + displayTime() + "ERROR> " + message);
   }
 }
 
