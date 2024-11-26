@@ -9,7 +9,10 @@
   "author": "",
   "license": "SEE LICENSE IN LICENSE FILE",
   "dependencies": {
+    "cheerio": "^1.0.0",
     "discord.js": "^14.16.3",
-    "nodemon": "^3.1.7"
+    "nodemon": "^3.1.7",
+    "request": "^2.88.2",
+    "xhr2": "^0.2.1"
   }
 }
