@@ -2,7 +2,7 @@ Clone the Repository
 
 cd dbbot
 npm install
-./startup &
+./startup.sh &
 
 Close shell and reconnect if you need to connect to console or something.
 Leaving the shell open and closing your computer will result in the program
