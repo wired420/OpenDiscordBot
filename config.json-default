@@ -1,0 +1,11 @@
+{
+  "token"  : "xxxxxxxxxxxxxxxxxxx",
+  "prefix" : "!",
+  "version": "1.0.0",
+  "appname": "DBBot",
+  "owner_id" : "239948288135004162",
+  "topMenu": "\nHelp Menu **<required>** *[optional]*\n----------------------------------------------------\n",
+  "botMenu": "For more info on a command try: '**!help** *[command]*'",
+  "weather": "xxxxxxxxxxxxxxxxxxx",
+  "debugMode": 1
+}
