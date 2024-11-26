@@ -1,8 +1,8 @@
 // include helpers
-const cmdList = require("./config/commands.json");
+//const cmdList = require("./config/commands.json");
 
 // Load config file
-const config = require("./config/config.json");
+const config = require("./config.json");
 
 // Import HTTP libs
 const http = require('http');
@@ -12,7 +12,17 @@ const cheerio = require('cheerio');
 // Import Weather Libs
 const XMLHttpRequest = require('xhr2');
 
-logIt(`${config.appname} ${config.version} starting up with owner ${config.owner_id}.`);
+// Require the necessary discord.js classes
+const { Client, Events, GatewayIntentBits } = require('discord.js');
+
+// Create a new client instance
+const client = new Client({ intents: [GatewayIntentBits.Guilds] });
+
+client.once(Events.ClientReady, readyClient => {
+    logIt(`${config.appname} ${config.version} starting up with owner ${config.owner_id}.`);
+});
+
+client.login(config.token);
 
 // Generic Helpers
 function capStr(str)
