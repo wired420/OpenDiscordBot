@@ -1,0 +1,11 @@
+Clone the Repository
+
+cd dbbot
+npm install
+./startup &
+
+Close shell and reconnect if you need to connect to console or something.
+Leaving the shell open and closing your computer will result in the program
+terminating. Closing the shell on command terminates normally and leaves it
+running in the background. Trust me on this one. Save yourself some time and
+headaches.
