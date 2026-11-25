@@ -1,16 +1,29 @@
-Clone the Repository
+OpenDiscordBot
+==============
 
+A small, general-purpose discord.js v14 bot. Requires Node.js 22.12 or newer.
+
+Setup
+-----
+
+git clone https://github.com/wired420/OpenDiscordBot.git
 cd OpenDiscordBot
 npm install
 cp config.json-default config.json
 
-Edit config.json with your discord bot API key and for any other settings you
-want to change.
+Edit config.json with your bot token, client id, your user id and any other
+settings. In the Discord Developer Portal, enable the "Message Content" intent
+for the bot (needed for the ! prefix commands).
 
-./startup.sh &
+npm run deploy      # register the /slash commands with Discord (once, and after changes)
+./startup.sh        # start the bot in a detached screen session
+npm run dev         # or: run in the foreground, restarting on file changes
 
-Close shell and reconnect if you need to connect to console or something.
-Leaving the shell open and closing your computer will result in the program
-terminating. Closing the shell on command terminates normally and leaves it
-running in the background. Trust me on this one. Save yourself some time and
-headaches.
+Features
+--------
+
+- Rules verification: reacting to the rules message with verifyEmoji gives verifyRoleId.
+- !help, !ptt / !pushtotalk
+- /everyone [message]   ping @everyone (members with the everyoneRoleName role; logged)
+- /server, /whoami
+- /reload               reload command files and re-register commands (owner only)

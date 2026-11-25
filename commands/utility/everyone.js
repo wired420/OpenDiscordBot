@@ -1,20 +1,28 @@
-const { SlashCommandBuilder } = require('discord.js');
+const { MessageFlags, SlashCommandBuilder } = require('discord.js');
+const config = require('../../config.json');
+const { channelLog } = require('../../lib/logger');
 
 module.exports = {
     data: new SlashCommandBuilder()
         .setName('everyone')
-        .setDescription('Tags all members. All uses of /everyone are logged.'),
+        .setDescription('Tags all members. All uses of /everyone are logged.')
+        .addStringOption(option =>
+            option.setName('message')
+                .setDescription('Optional message to include with the ping')
+                .setMaxLength(1500)),
     async execute(interaction) {
-        const bLogChannelId = '1489424090640027819';
+        const roleName = config.everyoneRoleName || 'Event Organizer';
 
-        if (interaction.member.roles.cache.some(r => r.name === "Event Organizer")) {
-            interaction.client.channels.cache.get(bLogChannelId).send(`[Bandit Bot]: ${interaction.user.username} has used the /everyone command in ${interaction.channelId}.`);
-            await interaction.reply(`\^ Raid Event: <@everyone> \^`);
+        if (!interaction.member.roles.cache.some(r => r.name === roleName)) {
+            await interaction.reply({ content: `Sorry, you need the **${roleName}** role to use this command.`, flags: MessageFlags.Ephemeral });
+            return;
         }
-        else {
-            await interaction.reply({ content: `Sorry. You do not have permission to use that command. See an officer or Kayenda for access`, ephemeral: true });
-        }
-        return;
-    }
+
+        const text = interaction.options.getString('message');
+        await interaction.reply({
+            content: text ? `@everyone ${text}` : '@everyone',
+            allowedMentions: { parse: ['everyone'] },
+        });
+        await channelLog(interaction.client, `[${config.appname}]: ${interaction.user.username} used /everyone in <#${interaction.channelId}>.`);
+    },
 };
-

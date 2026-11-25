@@ -1,25 +1,25 @@
-const { EmbedBuilder, SlashCommandBuilder } = require('discord.js');
+const { MessageFlags, SlashCommandBuilder } = require('discord.js');
+const config = require('../../config.json');
+const { logIt } = require('../../lib/logger');
+const { loadCommands, deployCommands } = require('../../lib/commands');
+
 module.exports = {
     data: new SlashCommandBuilder()
         .setName('reload')
-        .setDescription('Reloads the bot configuration files and command deploy scripts.'),
+        .setDescription('Reloads command files from disk and re-registers slash commands (bot owner only).'),
     async execute(interaction) {
+        if (interaction.user.id !== config.owner_id) {
+            await interaction.reply({ content: 'Only the bot owner can use this command.', flags: MessageFlags.Ephemeral });
+            return;
+        }
 
-        const { exec } = require('child_process');
+        await interaction.deferReply({ flags: MessageFlags.Ephemeral });
 
-        exec('node ~/banditbot/deploy-global.js', (error, stdout, stderr) => {
-            if (error) {
-                logIt(`Error Executing Shell Command: ${error}`, true);
-                return;
-            }
+        const commands = loadCommands();
+        interaction.client.commands = commands;
 
-            const embed = new EmbedBuilder()
-            .setColor(0xcc0000)
-            .setTitle(`Reloading Bot Files`)
-            .addFields(
-                { name: 'Output', value: stdout },
-             );
-            interaction.reply({ embeds: [embed], ephemeral: true });
-        });
-    }
+        const data = await deployCommands(config.token, config.clientId, commands);
+        logIt(`${interaction.user.tag} reloaded ${commands.size} commands; ${data.length} registered with Discord.`);
+        await interaction.editReply(`Reloaded ${commands.size} commands and registered ${data.length} with Discord. Global command changes can take a few minutes to show up.`);
+    },
 };
