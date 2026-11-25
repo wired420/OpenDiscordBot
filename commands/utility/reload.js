@@ -20,6 +20,6 @@ module.exports = {
 
         const data = await deployCommands(config.token, config.clientId, commands);
         logIt(`${interaction.user.tag} reloaded ${commands.size} commands; ${data.length} registered with Discord.`);
-        await interaction.editReply(`Reloaded ${commands.size} commands and registered ${data.length} with Discord. Global command changes can take a few minutes to show up.`);
+        await interaction.editReply(`Reloaded ${commands.size} commands and registered ${data.length} with Discord. Press Ctrl+R in Discord to see the changes right away.`);
     },
 };
