@@ -1,6 +1,6 @@
 Clone the Repository
 
-cd banditbot
+cd OpenDiscordBot
 npm install
 cp config.json-default config.json
 

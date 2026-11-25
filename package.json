@@ -1,13 +1,13 @@
 {
-  "name": "banditbot",
+  "name": "opendiscordbot",
   "version": "1.0.0",
-  "description": "Discord Bot Base for The Real Bandits",
+  "description": "OpenDiscordBot - an open, general-purpose discord.js bot",
   "main": "bandit.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
-  "license": "SEE LICENSE IN LICENSE FILE",
+  "license": "Unlicense",
   "dependencies": {
     "cheerio": "^1.0.0",
     "discord.js": "^14.16.3",
