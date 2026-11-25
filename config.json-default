@@ -1,15 +1,9 @@
 {
   "token": "Your Discord bot token (Developer Portal > Bot > Reset Token).",
   "clientId": "Your bot's application/client id. Used to register /slash commands.",
-  "owner_id": "Your Discord user id. Only this user can run /reload.",
+  "owner_id": "Your Discord user id. Can run /reload, and /settings and /setnick on any server.",
   "appname": "OpenDiscordBot",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "prefix": "!",
-  "logChannelId": "Id of an admin/moderator-only channel the bot logs to. Leave empty to disable.",
-  "everyoneRoleName": "Event Organizer",
-  "verifyEnable": 0,
-  "verifyMessageId": "Id of the rules message members react to.",
-  "verifyRoleId": "Id of the role given to members after they react.",
-  "verifyEmoji": "✅",
   "debugMode": 0
 }

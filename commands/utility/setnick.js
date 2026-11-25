@@ -1,5 +1,5 @@
 const { InteractionContextType, MessageFlags, PermissionFlagsBits, SlashCommandBuilder } = require('discord.js');
-const config = require('../../config.json');
+const { isOwnerOrAdmin } = require('../../lib/permissions');
 const { logIt } = require('../../lib/logger');
 
 module.exports = {
@@ -12,10 +12,7 @@ module.exports = {
                 .setDescription('New nickname. Leave empty to reset to the default name.')
                 .setMaxLength(32)),
     async execute(interaction) {
-        const isOwner = interaction.user.id === config.owner_id;
-        const isAdmin = interaction.memberPermissions?.has(PermissionFlagsBits.Administrator);
-
-        if (!isOwner && !isAdmin) {
+        if (!isOwnerOrAdmin(interaction)) {
             await interaction.reply({ content: 'Only the bot owner or server administrators can use this command.', flags: MessageFlags.Ephemeral });
             return;
         }

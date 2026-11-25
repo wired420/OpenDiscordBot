@@ -1,20 +1,27 @@
-const { MessageFlags, SlashCommandBuilder } = require('discord.js');
+const { InteractionContextType, MessageFlags, PermissionFlagsBits, SlashCommandBuilder } = require('discord.js');
 const config = require('../../config.json');
+const settings = require('../../lib/settings');
 const { channelLog } = require('../../lib/logger');
+const { isOwnerOrAdmin } = require('../../lib/permissions');
 
 module.exports = {
     data: new SlashCommandBuilder()
         .setName('everyone')
         .setDescription('Tags all members. All uses of /everyone are logged.')
+        .setContexts(InteractionContextType.Guild)
         .addStringOption(option =>
             option.setName('message')
                 .setDescription('Optional message to include with the ping')
                 .setMaxLength(1500)),
     async execute(interaction) {
-        const roleName = config.everyoneRoleName || 'Event Organizer';
+        const roleId = settings.get(interaction.guildId, 'everyoneRole');
+        const allowed = isOwnerOrAdmin(interaction)
+            || interaction.memberPermissions?.has(PermissionFlagsBits.MentionEveryone)
+            || (roleId && interaction.member.roles.cache.has(roleId));
 
-        if (!interaction.member.roles.cache.some(r => r.name === roleName)) {
-            await interaction.reply({ content: `Sorry, you need the **${roleName}** role to use this command.`, flags: MessageFlags.Ephemeral });
+        if (!allowed) {
+            const who = roleId ? `the <@&${roleId}> role` : 'server administrators';
+            await interaction.reply({ content: `Sorry, /everyone is limited to ${who}.`, flags: MessageFlags.Ephemeral, allowedMentions: { parse: [] } });
             return;
         }
 
@@ -23,6 +30,6 @@ module.exports = {
             content: text ? `@everyone ${text}` : '@everyone',
             allowedMentions: { parse: ['everyone'] },
         });
-        await channelLog(interaction.client, `[${config.appname}]: ${interaction.user.username} used /everyone in <#${interaction.channelId}>.`);
+        await channelLog(interaction.guild, `[${config.appname}]: ${interaction.user.username} used /everyone in <#${interaction.channelId}>.`);
     },
 };
