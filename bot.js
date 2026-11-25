@@ -1,3 +1,6 @@
+// Show up as "opendiscordbot" in ps/top instead of "node".
+process.title = 'opendiscordbot';
+
 const config = require('./config.json');
 const { Client, Events, GatewayIntentBits, MessageFlags, Partials } = require('discord.js');
 const { logIt, debug, channelLog } = require('./lib/logger');
