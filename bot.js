@@ -7,6 +7,7 @@ const { logIt, debug, channelLog } = require('./lib/logger');
 const { loadCommands } = require('./lib/commands');
 const settings = require('./lib/settings');
 const { importLegacyConfig } = require('./lib/legacyConfig');
+const tempbans = require('./lib/tempbans');
 
 const client = new Client({
     intents: [
@@ -27,11 +28,13 @@ client.once(Events.ClientReady, async readyClient => {
     } catch (error) {
         logIt(`Importing old config.json settings failed: ${error.stack ?? error}`, true);
     }
+    tempbans.start(readyClient);
 });
 
 client.on(Events.GuildCreate, guild => logIt(`Joined server "${guild.name}" (${guild.id}).`));
 client.on(Events.GuildDelete, guild => {
     settings.clearGuild(guild.id);
+    tempbans.clearGuild(guild.id);
     logIt(`Removed from server "${guild.name}" (${guild.id}); its settings were deleted.`);
 });
 

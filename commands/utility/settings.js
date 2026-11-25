@@ -2,6 +2,7 @@ const { ChannelType, EmbedBuilder, InteractionContextType, MessageFlags, SlashCo
 const settings = require('../../lib/settings');
 const { isOwnerOrAdmin } = require('../../lib/permissions');
 const { logIt } = require('../../lib/logger');
+const { BAN_DURATIONS, formatMinutes } = require('../../lib/duration');
 
 // How each setting is shown in /settings view.
 const display = {
@@ -12,6 +13,7 @@ const display = {
     verifyMessage: v => (v ? `\`${v}\`` : '*not set*'),
     verifyRole: v => (v ? `<@&${v}>` : '*not set*'),
     verifyEmoji: v => v,
+    spamBanMinutes: v => formatMinutes(v),
 };
 
 // Accepts a message id or a message link and returns the id.
@@ -42,6 +44,8 @@ module.exports = {
             .addStringOption(o => o.setName('message').setDescription('Rules message link (or right-click the message > Apps > Set as rules message)'))
             .addRoleOption(o => o.setName('role').setDescription('Role to give after reacting'))
             .addStringOption(o => o.setName('emoji').setDescription('Emoji members must react with (default ✅)').setMaxLength(64)))
+        .addSubcommand(sc => sc.setName('spamban').setDescription('Set how long the right-click Wipe Spam ban lasts.')
+            .addIntegerOption(o => o.setName('duration').setDescription('Ban length').setRequired(true).addChoices(...BAN_DURATIONS)))
         .addSubcommand(sc => sc.setName('reset').setDescription('Reset one setting, or all of them, to the default.')
             .addStringOption(o => o.setName('setting').setDescription('Setting to reset').setRequired(true)
                 .addChoices({ name: 'all', value: 'all' }, ...Object.keys(settings.DEFINITIONS).map(k => ({ name: k, value: k }))))),
@@ -122,6 +126,13 @@ module.exports = {
                 }
                 changed = `Rules verification is **${s.verifyEnabled ? 'on' : 'off'}**: react with ${s.verifyEmoji} on message \`${s.verifyMessage ?? 'not set'}\` to get ${s.verifyRole ? `<@&${s.verifyRole}>` : '*no role set*'}.`
                     + (notes.length ? `\n${notes.join('\n')}` : '');
+                break;
+            }
+
+            case 'spamban': {
+                const minutes = opts.getInteger('duration');
+                settings.set(guild.id, 'spamBanMinutes', minutes);
+                changed = minutes ? `Wipe Spam bans now last **${formatMinutes(minutes)}**.` : 'Wipe Spam bans are now **permanent**.';
                 break;
             }
 
