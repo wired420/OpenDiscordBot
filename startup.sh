@@ -1,1 +1,1 @@
-screen -dmS dbbot nodemon ~/dbbot/dbbot.js
+screen -dmS banditbot nodemon ~/banditbot/bandit.js

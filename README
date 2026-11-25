@@ -1,6 +1,6 @@
 Clone the Repository
 
-cd dbbot
+cd banditbot
 npm install
 cp config.json-default config.json
 

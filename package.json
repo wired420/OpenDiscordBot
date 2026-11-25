@@ -1,8 +1,8 @@
 {
-  "name": "dbbot",
+  "name": "banditbot",
   "version": "1.0.0",
-  "description": "Discord Bot Base for Digital Blasphemy",
-  "main": "dbbot.js",
+  "description": "Discord Bot Base for The Real Bandits",
+  "main": "bandit.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },

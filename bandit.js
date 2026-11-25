@@ -1,6 +1,4 @@
 // include helpers
-//const cmdList = require("./config/commands.json");
-
 // Load config file
 const config = require("./config.json");
 
@@ -17,10 +15,13 @@ const cheerio = require('cheerio');
 const XMLHttpRequest = require('xhr2');
 
 // Require the necessary discord.js classes
-const { Client, Collection, Events, GatewayIntentBits } = require('discord.js');
+const { Client, Collection, Events, GatewayIntentBits, Partials } = require('discord.js');
 
 // Create a new client instance
-const client = new Client({ intents: [GatewayIntentBits.Guilds] });
+const client = new Client({
+    intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.GuildMessageReactions, GatewayIntentBits.MessageContent],
+    partials: [Partials.Message, Partials.Channel, Partials.Reaction],
+});
 
 client.once(Events.ClientReady, readyClient => {
     logIt(`${config.appname} ${config.version} starting up with owner ${config.owner_id}.`);
@@ -48,14 +49,63 @@ for (const folder of commandFolders) {
     }
 }
 
-// Command Callback
+client.on(Events.MessageReactionAdd, async (reaction, user) => {
+    if (config.verifyEnable) {
+         if (reaction.partial) {
+             try {
+                 await reaction.fetch();
+             }
+             catch (error) {
+                 console.error('Something went wrong when fetching the message:', error);
+                 return;
+             }
+         }
+
+         if (reaction.message.id == config.verifyMessageId) {
+             if (reaction.emoji.name == config.verifyEmoji) {
+                 let u = await reaction.message.guild.members.cache.get(`${user.id}`);
+                 channelLog(`\[${config.appname}\]: ${u.displayName} has accepted the rules! Adding to Members group.`);
+                 await reaction.message.guild.members.cache.get(`${user.id}`).roles.add(config.verifyRoleId);
+             }
+         }
+    }
+});
+
+//client.on('messageCreate', message => {
+client.on(Events.MessageCreate, async message => {
+    if (message.partial) {
+        try {
+             await message.fetch();
+        }
+        catch (error) {
+            logIt(`Something went wrong with retriving message with id ${message}`);
+            return;
+        }
+    }
+
+    if (!message.content.startsWith(config.prefix) || message.author.bot) return;
+    let m = message.content.slice(1);
+
+    if (m.toLowerCase() === "help") {
+        await message.channel.send('[Bandit Bot: Help] My trigger commands are: !help, !maps, !ptt/!pushtotalk');
+    }
+    if (m.toLowerCase() === "maps") {
+        await message.channel.send('**Brewall\'s Maps** -> https://www.eqmaps.info/wp-content/uploads/2024/01/brewall-20240109.zip Put in **EverQuest\\Maps** directory. Overwrite any existing files. If you do it while games loaded you can do `/loadskin default 1` to get the game to load them without restarting. The **1** is important. It keeps your ui and boxes where they are.');
+    }
+    else if (m.toLowerCase() === "ptt" || m.toLowerCase() === "pushtotalk") {
+        await message.channel.send('**Push to Talk** -> In your discord window. Click **User Settings**. It looks like a little gear. Go to the **Voice & Video** tab on the left. Scroll down a very short way to **Input Profile**. Under input profile look for **Push to Talk** and make sure the slider is blue and its turned on. Next just below it click **Edit Keybind** and pick a key to use. (**Kayenda Pro Tip**: *I personally use **PAUSE** button next to scroll lock because it is not near any other buttons and is mostly unused in all software.*)');
+    }
+
+    await message.delete();
+});
+
 client.on(Events.InteractionCreate, async interaction => {
-    if (!interaction.isChatInputCommand()) return;
+    if (!interaction.isChatInputCommand() || interaction.user.bot) return;
 
     const command = interaction.client.commands.get(interaction.commandName);
 
     if (!command) {
-        logIt(`No command matching ${interaction.commandName} was found.`, true);
+        logIt(`\[${interaction.commandName}\] Command doesn't exist`);
         return;
     }
 
@@ -115,6 +165,11 @@ function logIt(message, isError = false)
   {
     console.error(`[${config.appname}] ` + displayTime() + "> ERROR: " + message);
   }
+}
+
+// Log to logs channel
+function channelLog(message) {
+    client.channels.cache.get(config.logChannelId).send(message);
 }
 
 // Format Timestamps

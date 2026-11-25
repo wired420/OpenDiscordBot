@@ -7,7 +7,7 @@ module.exports = {
 
         const { exec } = require('child_process');
 
-        exec('node ~/dbbot/deploy-global.js', (error, stdout, stderr) => {
+        exec('node ~/banditbot/deploy-global.js', (error, stdout, stderr) => {
             if (error) {
                 logIt(`Error Executing Shell Command: ${error}`, true);
                 return;
