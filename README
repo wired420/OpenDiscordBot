@@ -25,6 +25,7 @@ Features
 - Rules verification: reacting to the rules message with verifyEmoji gives verifyRoleId.
 - !help, !ptt / !pushtotalk
 - /everyone [message]   ping @everyone (members with the everyoneRoleName role; logged)
+- /setnick [nickname]   set (or reset) the bot's nickname on this server (owner or admins)
 - /server, /whoami
 - /reload               reload command files and re-register commands (owner only)
 
