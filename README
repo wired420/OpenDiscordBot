@@ -27,3 +27,15 @@ Features
 - /everyone [message]   ping @everyone (members with the everyoneRoleName role; logged)
 - /server, /whoami
 - /reload               reload command files and re-register commands (owner only)
+
+Running as a systemd service (Linux)
+------------------------------------
+
+Edit User and WorkingDirectory in opendiscordbot.service, then:
+
+sudo cp opendiscordbot.service /etc/systemd/system/
+sudo systemctl daemon-reload
+sudo systemctl enable --now opendiscordbot
+journalctl -u opendiscordbot -f     # follow the logs
+
+To update: git pull && npm ci --omit=dev && npm run deploy && sudo systemctl restart opendiscordbot

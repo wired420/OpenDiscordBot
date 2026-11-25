@@ -1,0 +1,18 @@
+[Unit]
+Description=OpenDiscordBot (discord.js bot)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=cjohnson
+WorkingDirectory=/home/cjohnson/OpenDiscordBot
+ExecStart=/usr/bin/node bot.js
+Restart=on-failure
+RestartSec=10
+NoNewPrivileges=true
+ProtectSystem=full
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target
