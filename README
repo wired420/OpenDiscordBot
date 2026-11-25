@@ -30,6 +30,7 @@ with /settings by the bot owner or server administrators. Back up data/ to keep 
 - /everyone [message]   ping @everyone (admins, or the role set with /settings everyonerole; logged)
 - /setnick [nickname]   set (or reset) the bot's nickname on this server (owner or admins)
 - /settings            view/change per-server settings: prefix, log channel, /everyone role, verify
+- Right-click a message > Apps > Set as rules message   (owner or admins; adds the reaction)
 - /server, /whoami
 - /reload               reload command files and re-register commands (owner only)
 
