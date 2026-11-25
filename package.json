@@ -2,10 +2,10 @@
   "name": "opendiscordbot",
   "version": "1.1.0",
   "description": "OpenDiscordBot - an open, general-purpose discord.js bot",
-  "main": "index.js",
+  "main": "bot.js",
   "scripts": {
-    "start": "node index.js",
-    "dev": "node --watch index.js",
+    "start": "node bot.js",
+    "dev": "node --watch bot.js",
     "deploy": "node deploy-global.js"
   },
   "engines": {
