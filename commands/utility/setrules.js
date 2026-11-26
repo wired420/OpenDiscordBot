@@ -17,6 +17,9 @@ module.exports = {
             return;
         }
 
+        // Adding the reaction can be slow under rate limits; defer so the 3-second reply window can't expire.
+        await interaction.deferReply({ flags: MessageFlags.Ephemeral });
+
         const message = interaction.targetMessage;
         const guild = interaction.guild;
         const s = settings.getAll(guild.id);
@@ -43,7 +46,9 @@ module.exports = {
         }
 
         logIt(`${interaction.user.tag} set the rules message on ${guild.name} to ${message.id}`);
-        await channelLog(guild, `[Settings]: ${interaction.user.username} set the rules message: ${message.url}`);
-        await reply(lines.join('\n'));
+        await Promise.all([
+            interaction.editReply({ content: lines.join('\n'), allowedMentions: { parse: [] } }),
+            channelLog(guild, `[Settings]: ${interaction.user.username} set the rules message: ${message.url}`),
+        ]);
     },
 };

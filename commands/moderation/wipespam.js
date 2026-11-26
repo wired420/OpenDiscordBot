@@ -55,13 +55,16 @@ module.exports = {
             return;
         }
 
-        const me = guild.members.me ?? await guild.members.fetchMe();
+        // Both lookups at once: the confirm prompt has to go out within Discord's 3-second reply window.
+        const [me, member] = await Promise.all([
+            guild.members.me ?? guild.members.fetchMe(),
+            guild.members.fetch(target.id).catch(() => null), // null if they already left
+        ]);
         if (!me.permissions.has(PermissionFlagsBits.BanMembers)) {
             await interaction.reply(ephemeral('I need the **Ban Members** permission to do that.'));
             return;
         }
 
-        const member = await guild.members.fetch(target.id).catch(() => null);
         if (member) {
             if (member.permissions.has(PermissionFlagsBits.Administrator)) {
                 await interaction.reply(ephemeral(`${member} is an administrator. Remove their admin role first if their account is compromised.`));
@@ -125,7 +128,9 @@ module.exports = {
         const summary = `**${target.tag}** was banned ${durationText} and their messages from the last 2 hours were deleted. `
             + (dmSent ? 'They were sent a DM about securing their account.' : 'I couldn\'t DM them (their DMs are closed).');
         logIt(`Wipe Spam: ${interaction.user.tag} wiped ${target.tag} (${target.id}) on ${guild.name}, ban ${formatMinutes(minutes)}, DM ${dmSent ? 'sent' : 'failed'}.`);
-        await channelLog(guild, `[Wipe Spam]: ${interaction.user.username} wiped spam from <@${target.id}> (${target.tag}). Ban length: ${formatMinutes(minutes)}. Last 2 hours of messages deleted. Warning DM ${dmSent ? 'sent' : 'not delivered'}.`);
-        await interaction.editReply(ephemeral(summary));
+        await Promise.all([
+            interaction.editReply(ephemeral(summary)),
+            channelLog(guild, `[Wipe Spam]: ${interaction.user.username} wiped spam from <@${target.id}> (${target.tag}). Ban length: ${formatMinutes(minutes)}. Last 2 hours of messages deleted. Warning DM ${dmSent ? 'sent' : 'not delivered'}.`),
+        ]);
     },
 };

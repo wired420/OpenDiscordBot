@@ -87,11 +87,13 @@ client.on(Events.MessageCreate, async message => {
     if (!handler) return;
 
     debug(`${message.author.tag} used ${prefix}${name}`);
-    try {
-        await message.channel.send(handler(prefix));
-        if (message.deletable) await message.delete();
-    } catch (error) {
-        logIt(`Prefix command ${name} failed: ${error.message}`, true);
+    // Reply and remove the trigger message at the same time; one failing doesn't stop the other.
+    const results = await Promise.allSettled([
+        message.channel.send(handler(prefix)),
+        message.deletable ? message.delete() : null,
+    ]);
+    for (const r of results) {
+        if (r.status === 'rejected') logIt(`Prefix command ${name} failed: ${r.reason?.message ?? r.reason}`, true);
     }
 });
 
@@ -117,4 +119,9 @@ client.on(Events.InteractionCreate, async interaction => {
     }
 });
 
-client.login(config.token);
+// If login fails (bad token, Discord unreachable), exit so systemd restarts us instead of
+// leaving a process that looks alive but isn't connected.
+client.login(config.token).catch(error => {
+    logIt(`Login failed: ${error.message}`, true);
+    process.exit(1);
+});
